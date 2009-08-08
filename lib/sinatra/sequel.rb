@@ -23,7 +23,7 @@ module Sinatra
 
     def migration(name, &block)
       create_migrations_table
-      return if database[:migrations].filter(:name => name).count > 0
+      return if database[migrations_table_name].filter(:name => name).count > 0
       migrations_log.puts "Running migration: #{name}"
       database.transaction do
         yield database
