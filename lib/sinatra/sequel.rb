@@ -21,15 +21,6 @@ module Sinatra
         Sequel.connect(database_url)
     end
 
-    def sqlite?
-      defined?(Sequel::SQLite::Database) && database.kind_of?(Sequel::SQLite::Database)
-    end
-
-    # TODO: wrong!
-    def postgres?
-      ! sqlite?
-    end
-
     def migration(name, &block)
       create_migrations_table
       return if database[:migrations].filter(:name => name).count > 0
@@ -38,6 +29,10 @@ module Sinatra
         yield database
         database[migrations_table_name] << { :name => name, :ran_at => Time.now }
       end
+    end
+
+    Sequel::Database::ADAPTERS.each do |adapter|
+      define_method("#{adapter}?") { @database.database_type == adapter } 
     end
 
   protected

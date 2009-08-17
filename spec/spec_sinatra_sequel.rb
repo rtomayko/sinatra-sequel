@@ -55,4 +55,16 @@ describe 'A Sinatra app with Sequel extensions' do
     @app.migration('this should run once') { fail }
     @app.database[:migrations].count.should.equal 1
   end
+
+  it 'allows you to query what adapter is being used' do
+    @app.database = 'sqlite://test.db'
+    @app.sqlite?.should.equal true
+  end
+
+
+  it 'exposes a query for all available sequel adapters' do
+    Sequel::Database::ADAPTERS.each do |adapter|
+      @app.should.respond_to "#{adapter}?"
+    end
+  end
 end
