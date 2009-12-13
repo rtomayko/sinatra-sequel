@@ -40,7 +40,7 @@ module Sinatra
     def create_migrations_table
       database.create_table? :migrations do
         primary_key :id
-        text :name, :null => false, :index => true
+        String :name, :null => false, :index => true
         timestamp :ran_at
       end
     end
