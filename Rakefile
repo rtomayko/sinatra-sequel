@@ -9,51 +9,43 @@ end
 
 # PACKAGING ============================================================
 
-# Load the gemspec using the same limitations as github
-require 'rubygems/specification'
-$spec = eval(File.read('sinatra-sequel.gemspec'))
+if defined?(Gem)
+  # Load the gemspec using the same limitations as github
+  $spec = eval(File.read('sinatra-sequel.gemspec'))
 
-def package(ext='')
-  "pkg/#{$spec.name}-#{$spec.version}" + ext
+  def package(ext='')
+    "pkg/#{$spec.name}-#{$spec.version}" + ext
+  end
+
+  desc 'Build packages'
+  task :package => %w[.gem .tar.gz].map { |ext| package(ext) }
+
+  desc 'Build and install as local gem'
+  task :install => package('.gem') do
+    sh "gem install #{package('.gem')}"
+  end
+
+  directory 'pkg/'
+  CLOBBER.include('pkg')
+
+  file package('.gem') => %W[pkg/ #{$spec.name}.gemspec] + $spec.files do |f|
+    sh "gem build #{$spec.name}.gemspec"
+    mv File.basename(f.name), f.name
+  end
+
+  file package('.tar.gz') => %w[pkg/] + $spec.files do |f|
+    sh <<-SH
+      git archive \
+        --prefix=#{$spec.name}-#{$spec.version}/ \
+        --format=tar \
+        HEAD | gzip > #{f.name}
+    SH
+  end
 end
 
-desc 'Build packages'
-task :package => %w[.gem .tar.gz].map { |ext| package(ext) }
-
-desc 'Build and install as local gem'
-task :install => package('.gem') do
-  sh "gem install #{package('.gem')}"
-end
-
-directory 'pkg/'
-CLOBBER.include('pkg')
-
-file package('.gem') => %W[pkg/ #{$spec.name}.gemspec] + $spec.files do |f|
-  sh "gem build #{$spec.name}.gemspec"
-  mv File.basename(f.name), f.name
-end
-
-file package('.tar.gz') => %w[pkg/] + $spec.files do |f|
-  sh <<-SH
-    git archive \
-      --prefix=#{$spec.name}-#{$spec.version}/ \
-      --format=tar \
-      HEAD | gzip > #{f.name}
-  SH
-end
-
-# Rubyforge Release / Publish Tasks ==================================
-
-desc 'Publish gem and tarball to rubyforge'
-task 'release' => [package('.gem'), package('.tar.gz')] do |t|
-  sh <<-SH
-    rubyforge add_release wink #{$spec.name} #{$spec.version} #{package('.gem')} &&
-    rubyforge add_file    wink #{$spec.name} #{$spec.version} #{package('.tar.gz')}
-  SH
-end
 
 # rebuild the gemspec manifest and update timestamps.
-task "#{$spec.name}.gemspec" => FileList['{lib,spec}/**','Rakefile','COPYING','README.md'] do |f|
+task "sinatra-sequel.gemspec" => FileList['{lib,spec}/**','Rakefile','COPYING','README.md'] do |f|
   # read spec file and split out manifest section
   spec = File.read(f.name)
   head, manifest, tail = spec.split("  # = MANIFEST =\n")
