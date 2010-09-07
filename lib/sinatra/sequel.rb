@@ -18,7 +18,7 @@ module Sinatra
 
     def database
       @database ||=
-        Sequel.connect(database_url)
+        Sequel.connect(database_url, :encoding => 'utf-8')
     end
 
     def migration(name, &block)
@@ -32,7 +32,7 @@ module Sinatra
     end
 
     Sequel::Database::ADAPTERS.each do |adapter|
-      define_method("#{adapter}?") { @database.database_type == adapter } 
+      define_method("#{adapter}?") { @database.database_type == adapter }
     end
 
   protected
