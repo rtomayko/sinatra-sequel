@@ -17,8 +17,12 @@ module Sinatra
     end
 
     def database
+      # MySQL's UTF-8 encoding is "utf8" without the hyphen.
+      is_mysql = database_url =~ /^mysql/
+      encoding = is_mysql ? "utf8" : "utf-8"
+
       @database ||=
-        Sequel.connect(database_url, :encoding => 'utf-8')
+        Sequel.connect(database_url, :encoding => encoding)
     end
 
     def migration(name, &block)
@@ -37,10 +41,22 @@ module Sinatra
 
   protected
 
+    def mysql?
+      defined?(Sequel::MySQL::Database) && database.kind_of?(Sequel::MySQL::Database)
+    end
+
     def create_migrations_table
+      is_mysql = mysql?
+
       database.create_table? :migrations do
         primary_key :id
-        String :name, :null => false, :index => true
+
+        if is_mysql
+          # MySQL indices need a size, which Sequel doesn't seem to support.
+          String :name, :null => false
+        else
+          String :name, :null => false, :index => true
+        end
         timestamp :ran_at
       end
     end
