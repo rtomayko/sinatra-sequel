@@ -38,7 +38,7 @@ module Sinatra
   protected
 
     def create_migrations_table
-      database.create_table? :migrations do
+      database.create_table? migrations_table_name do
         primary_key :id
         String :name, :null => false, :index => true
         timestamp :ran_at
