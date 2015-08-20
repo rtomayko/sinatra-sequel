@@ -5,16 +5,16 @@ Extends [Sinatra](http://www.sinatrarb.com/) with a variety of extension methods
 for dealing with a SQL database using the [Sequel ORM](http://sequel.rubyforge.org/).
 
 Install the `sinatra-sequel` gem along with one of the database adapters:
-
+```
     sudo gem install sequel sinatra-sequel
     sudo gem install sqlite3
     sudo gem install mysql
     sudo gem install postgres
-
+```
 I like to split database configuration and migrations out into a separate
 `database.rb` file and then require it from the main app file, but you can plop
 the following code in about anywhere and it'll work just fine:
-
+```ruby
     require 'sinatra'
     require 'sinatra/sequel'
 
@@ -66,7 +66,7 @@ the following code in about anywhere and it'll work just fine:
       @foo = Foo[params[:id]]
       @foo.delete
     end
-
+```
 ### Sequel Reference Material
 
   * The [Sequel README](http://sequel.rubyforge.org/rdoc/files/README_rdoc.html)
