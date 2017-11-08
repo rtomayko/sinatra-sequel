@@ -82,3 +82,7 @@ the following code in about anywhere and it'll work just fine:
     and the [Associations](http://sequel.rubyforge.org/rdoc/files/doc/advanced_associations_rdoc.html) doc.
     You might find this post on [many_to_many / one_to_one](http://steamcode.blogspot.com/2009/03/sequel-models-manytoone-onetomany.html)
     useful.
+
+### Status
+
+*This repository is no longer actively maintained by @rtomayko as of 2017-11-08. Issues and PRs documenting current issues have been intentionally left open for informational purposes.*
