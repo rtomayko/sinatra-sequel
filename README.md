@@ -20,7 +20,7 @@ the following code in about anywhere and it'll work just fine:
 
     # Establish the database connection; or, omit this and use the DATABASE_URL
     # environment variable as the connection string:
-    set :database, 'sqlite://foo.db'
+    set :database, "sqlite://#{ENV['RACK_ENV']}.db"
 
     # At this point, you can access the Sequel Database object using the
     # "database" object:
